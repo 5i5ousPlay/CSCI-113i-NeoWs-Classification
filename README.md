@@ -59,10 +59,61 @@ Preprocessing steps will include:
 ---
 
 ## **Modeling**
+
+### **Tuner Class**
+
+The `XGBModelTuner` class in `tuner.py` provides a reusable and extensible way to perform hyperparameter optimization for any XGBoost model (e.g., `XGBClassifier`, `XGBRegressor`, `XGBRFClassifier`). It wraps around scikit-learn’s `RandomizedSearchCV` (or any compatible search optimizer) and automates the process of selecting the best model and saving the results.
+
+#### **Features:**
+- Supports both classification and regression XGBoost models.
+- Accepts any compatible optimizer (`RandomizedSearchCV` by default).
+- Allows optional saving of the best model and parameters.
+- Easily configurable with cross-validation settings, verbosity, and parallel jobs.
+
+### **Usage**
+
+```python
+from sklearn.model_selection import StratifiedKFold
+from tuner import XGBModelTuner
+import xgboost as xgb
+
+# Define your cross-validation strategy
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+# Initialize the model
+model = xgb.XGBRFClassifier(tree_method='hist', device='cpu', seed=42)
+
+# Define the hyperparameter search space
+param_grid = {
+    "colsample_bynode": [0.4, 0.6, 0.8],
+    "subsample": [0.4, 0.6, 0.8],
+    "max_depth": [3, 5, 7],
+    "n_estimators": [100, 200, 300, 400],
+    "reg_lambda": [1, 1.5, 2],
+    "gamma": [0, 0.1, 0.3],
+}
+
+# Initialize the tuner
+tuner = XGBModelTuner(model, param_grid, X_train, Y_train)
+
+# Run the tuning process
+optimized_model = tuner.run(
+    save_model=True,              # Save the best model to disk
+    save_params=True,             # Save the best hyperparameters to disk
+    model_path='xgb_model.json',  # Optional: specify path for model
+    param_path='model_params.json',  # Optional: specify path for params
+    cv=skf                        # Use stratified K-fold cross-validation
+)
+```
+
+The best model will be returned and saved (if specified), and the optimal parameters will be printed to the console and optionally saved as a JSON file.
+
+---
+
 ### **Gradient Boosted Tree Model**
-🚧 *To be documented...*  
+🚧 *To be documented...*
 
 ### **Neural Network Model**
-🚧 *To be documented...*  
+🚧 *To be documented...*
 
 ---
