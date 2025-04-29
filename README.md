@@ -49,15 +49,6 @@ etl.run(0, 1000, skip_extract=True,
 
 ---
 
-## **Data Preprocessing**
-🚧 *To be documented...*  
-Preprocessing steps will include:
-- Handling missing values  
-- Feature engineering  
-- Scaling for neural networks (not required for XGBoost)
-
----
-
 ## **Modeling**
 
 ### **Tuner Class**
@@ -111,9 +102,76 @@ The best model will be returned and saved (if specified), and the optimal parame
 ---
 
 ### **Gradient Boosted Tree Model**
-🚧 *To be documented...*
 
-### **Neural Network Model**
-🚧 *To be documented...*
+The **Gradient Boosted Classifier** was trained both on the **original imbalanced dataset** and on a **SMOTE-oversampled dataset** to assess its ability to detect hazardous asteroids.
+
+#### 🔍 Without Oversampling:
+- **Accuracy:** 94.66%  
+- **Recall:** 34.18%  
+- **Precision:** 68.63%  
+- **F1-Score:** 0.456  
+- **ROC-AUC:** 0.665  
+While the model showed high overall accuracy and precision, its **recall was poor**, indicating that it often **failed to identify actual hazardous asteroids**. This is a critical limitation for high-risk classification.
+
+#### ✅ With SMOTE Oversampling:
+- **Accuracy:** 90.34%  
+- **Recall:** 88.87%  
+- **Precision:** 39.50%  
+- **F1-Score:** 0.547  
+- **ROC-AUC:** 0.897  
+Oversampling significantly improved recall and ROC-AUC, making the model more reliable in identifying hazardous objects. However, compared to the Random Forest model (also trained on oversampled data), this model performed slightly worse in these key metrics.
+
+---
+
+### **Random Forest Model**
+
+The **Random Forest Classifier** demonstrated strong generalization and interpretability, especially when trained with SMOTE to mitigate the effects of class imbalance.
+
+#### 🔍 Without Oversampling:
+- **Accuracy:** 94.03%  
+- **Recall:** 61.91%  
+- **Precision:** 53.91%  
+- **F1-Score:** 0.576  
+- **ROC-AUC:** 0.791  
+Better recall than the gradient booster (without oversampling), but still struggled to correctly detect all hazardous asteroids. High accuracy was misleading due to the dominance of non-hazardous cases.
+
+#### ✅ With SMOTE Oversampling:
+- **Accuracy:** 88.21%  
+- **Recall:** 94.14%  
+- **Precision:** 35.13%  
+- **F1-Score:** 0.512  
+- **ROC-AUC:** 0.910  
+This configuration offered the **best balance** of all models, with **very high recall** and the highest ROC-AUC score, making it the most suitable choice for real-world deployment where **missing hazardous asteroids is unacceptable**.
+
+---
+
+### **🔁 Loading Pretrained Models**
+
+If you want to skip training and **load pretrained models** directly from the `models/` directory, you can do so using XGBoost's `.load_model()` method.
+
+#### ✅ Load Pretrained Gradient Boosted Classifier
+```python
+import xgboost as xgb
+
+# Initialize an empty XGBClassifier
+model = xgb.XGBClassifier()
+
+# Load the trained model from disk
+model.load_model("models/gradient_booster.json")
+```
+
+#### ✅ Load Pretrained Random Forest Classifier
+```python
+import xgboost as xgb
+
+# Initialize an empty XGBRFClassifier
+model = xgb.XGBRFClassifier()
+
+# Load the trained model from disk
+model.load_model("models/random_forest.json")
+```
+
+> 📁 Make sure the model file you're referencing (e.g., `gradient_booster.json` or `random_forest.json`) exists in the `models/` folder.  
+> If you used the `XGBModelTuner` to save models, it will output them in this format by default.
 
 ---
