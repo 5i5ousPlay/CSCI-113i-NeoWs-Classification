@@ -4,6 +4,8 @@ It demonstrates the **CRISP-DM** process with the goal of building a model capab
 
 This README provides light documentation for the code and instructions for running the ETL pipeline and models.
 
+**[Project Presentation](https://github.com/5i5ousPlay/CSCI-113i-NeoWs-Classification)**
+
 ---
 
 ## **Extract, Transform, Load (ETL)**
